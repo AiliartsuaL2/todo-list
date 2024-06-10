@@ -153,11 +153,11 @@ class MemberTest {
             String emptyMemberId = "";
 
             // when & then
-            assertThatThrownBy(() -> MEMBER.withDraw(memberId, LOGIN_ID, PASSWORD))
+            assertThatThrownBy(() -> MEMBER.withdraw(memberId, LOGIN_ID, PASSWORD))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
 
-            assertThatThrownBy(() -> MEMBER.withDraw(emptyMemberId, LOGIN_ID, PASSWORD))
+            assertThatThrownBy(() -> MEMBER.withdraw(emptyMemberId, LOGIN_ID, PASSWORD))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         }
@@ -170,11 +170,11 @@ class MemberTest {
             String emptyLoginId = "";
 
             // when & then
-            assertThatThrownBy(() -> MEMBER.withDraw(MEMBER_ID, loginId, PASSWORD))
+            assertThatThrownBy(() -> MEMBER.withdraw(MEMBER_ID, loginId, PASSWORD))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_LOGIN_ID.getMessage());
 
-            assertThatThrownBy(() -> MEMBER.withDraw(MEMBER_ID, emptyLoginId, PASSWORD))
+            assertThatThrownBy(() -> MEMBER.withdraw(MEMBER_ID, emptyLoginId, PASSWORD))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_LOGIN_ID.getMessage());
         }
@@ -187,11 +187,11 @@ class MemberTest {
             String emptyPassword = "";
 
             // when & then
-            assertThatThrownBy(() -> MEMBER.withDraw(MEMBER_ID, LOGIN_ID, password))
+            assertThatThrownBy(() -> MEMBER.withdraw(MEMBER_ID, LOGIN_ID, password))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_PASSWORD.getMessage());
 
-            assertThatThrownBy(() -> MEMBER.withDraw(MEMBER_ID, LOGIN_ID, emptyPassword))
+            assertThatThrownBy(() -> MEMBER.withdraw(MEMBER_ID, LOGIN_ID, emptyPassword))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_PASSWORD.getMessage());
         }
@@ -205,7 +205,7 @@ class MemberTest {
                     .thenReturn(MEMBER_ID+"different");
 
             // when & then
-            assertThatThrownBy(() -> member.withDraw(MEMBER_ID, LOGIN_ID, PASSWORD))
+            assertThatThrownBy(() -> member.withdraw(MEMBER_ID, LOGIN_ID, PASSWORD))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_MATCHED_ID.getMessage());
         }
@@ -217,7 +217,7 @@ class MemberTest {
             String loginId = LOGIN_ID + "different";
 
             // when & then
-            assertThatThrownBy(() -> MEMBER.withDraw(MEMBER_ID, loginId, PASSWORD))
+            assertThatThrownBy(() -> MEMBER.withdraw(MEMBER_ID, loginId, PASSWORD))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_MATCHED_LOGIN_ID.getMessage());
         }
@@ -229,7 +229,7 @@ class MemberTest {
             String password = PASSWORD + "different";
 
             // when & then
-            assertThatThrownBy(() -> MEMBER.withDraw(MEMBER_ID, LOGIN_ID, password))
+            assertThatThrownBy(() -> MEMBER.withdraw(MEMBER_ID, LOGIN_ID, password))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorMessage.NOT_MATCHED_PASSWORD.getMessage());
         }
@@ -243,7 +243,7 @@ class MemberTest {
                     .thenReturn(MEMBER_ID);
 
             // when
-            member.withDraw(MEMBER_ID, LOGIN_ID, PASSWORD);
+            member.withdraw(MEMBER_ID, LOGIN_ID, PASSWORD);
 
             // then
             assertThat(member.getDeleteYn()).isTrue();

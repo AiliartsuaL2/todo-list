@@ -19,7 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "member")
+@Table(name = "MEMBER")
 public class Member extends BaseEntity {
 
     private static final BCryptPasswordEncoder B_CRYPT_PASSWORD_ENCODER = new BCryptPasswordEncoder();
@@ -61,10 +61,10 @@ public class Member extends BaseEntity {
         return this.getId();
     }
 
-    public void withDraw(String payload, String loginId, String password) {
+    public void withdraw(String memberId, String loginId, String password) {
         validateLoginId(loginId);
         validatePassword(password);
-        validateId(payload);
+        validateId(memberId);
 
         this.deleteYn = Boolean.TRUE;
         this.deletedAt = LocalDateTime.now();
@@ -77,7 +77,7 @@ public class Member extends BaseEntity {
         }
     }
 
-    private void validateId(String id) {
+    public void validateId(String id) {
         notNullValidation(id, ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         // 단위 테스트를 위해 getId 사용
         if (!this.getId().equals(id)) {

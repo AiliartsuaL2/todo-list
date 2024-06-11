@@ -50,7 +50,6 @@ public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseC
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.NOT_EXIST_MEMBER.getMessage()));
 
         // 토큰의 payload와 비교
-        member.validateId(payload);
-        member.withdraw(requestDto.memberId(), requestDto.loginId(), requestDto.password());
+        member.withdraw(payload, requestDto.loginId(), requestDto.password());
     }
 }

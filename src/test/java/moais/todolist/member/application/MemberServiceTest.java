@@ -120,10 +120,10 @@ class MemberServiceTest {
     @DisplayName("회원 탈퇴 테스트")
     class Withdraw {
         @Test
-        @DisplayName("회원 ID가 존재하지 않는 경우 예외가 발생한다.")
+        @DisplayName("payload(회원 ID)가 존재하지 않는 경우 예외가 발생한다.")
         void test1() {
             // given
-            WithdrawRequestDto requestDto = new WithdrawRequestDto(MEMBER_ID, LOGIN_ID, PASSWORD);
+            WithdrawRequestDto requestDto = new WithdrawRequestDto(LOGIN_ID, PASSWORD);
             String memberId = null;
 
             // when & then
@@ -136,7 +136,7 @@ class MemberServiceTest {
         @DisplayName("로그인 ID에 해당하는 회원이 존재하지 않는 경우 예외가 발생한다.")
         void test2() {
             // given
-            WithdrawRequestDto requestDto = new WithdrawRequestDto(MEMBER_ID, LOGIN_ID, PASSWORD);
+            WithdrawRequestDto requestDto = new WithdrawRequestDto(LOGIN_ID, PASSWORD);
             when(memberRepository.findMemberByLoginId(requestDto.loginId()))
                     .thenReturn(Optional.empty());
 
@@ -147,28 +147,10 @@ class MemberServiceTest {
         }
 
         @Test
-        @DisplayName("토큰의 ID와 탈퇴하고자하는 회원의 ID가 다른 경우 예외가 발생한다.")
+        @DisplayName("정상 요청시 withdraw 메서드가 실행된다.")
         void test3() {
             // given
-            WithdrawRequestDto requestDto = new WithdrawRequestDto(MEMBER_ID, LOGIN_ID, PASSWORD);
-            Member member = spy(Member.class);
-            when(member.getId())
-                    .thenReturn(MEMBER_ID);
-            when(memberRepository.findMemberByLoginId(requestDto.loginId()))
-                    .thenReturn(Optional.of(member));
-            String payload = MEMBER_ID + "payload";
-
-            // when & then
-            assertThatThrownBy(() -> memberService.withdraw(requestDto, payload))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage(ErrorMessage.NOT_MATCHED_ID.getMessage());
-        }
-
-        @Test
-        @DisplayName("정상 요청시 withdraw 메서드가 실행된다.")
-        void test4() {
-            // given
-            WithdrawRequestDto requestDto = new WithdrawRequestDto(MEMBER_ID, LOGIN_ID, PASSWORD);
+            WithdrawRequestDto requestDto = new WithdrawRequestDto(LOGIN_ID, PASSWORD);
             Member member = mock(Member.class);
             when(member.getId())
                     .thenReturn(MEMBER_ID);
@@ -181,7 +163,7 @@ class MemberServiceTest {
             // then
             then(member)
                     .should(times(1))
-                    .withdraw(requestDto.memberId(), requestDto.loginId(), requestDto.password());
+                    .withdraw(MEMBER_ID, requestDto.loginId(), requestDto.password());
         }
     }
 }

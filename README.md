@@ -27,23 +27,19 @@
       - 비밀번호가 일치하지 않는 경우 예외가 발생한다.
     - 회원탈퇴
       - 액세스 토큰이 존재하지 않는 경우 예외가 발생한다.
-      - 필수 인자(회원 ID, 로그인 ID, 비밀번호)가 존재하지 않는 경우 예외가 발생한다.
-      - 토큰의 payload와 회원 ID, 로그인 ID, 비밀번호가 일치하지 않는 경우 예외가 발생한다.
+      - 필수 인자(로그인 ID, 비밀번호)가 존재하지 않는 경우 예외가 발생한다.
+      - 토큰의 payload로 조회한 데이터와 입력한 데이터(로그인 ID, 비밀번호)가 일치하지 않는 경우 예외가 발생한다.
   - TODO
     - 추가
       - 액세스 토큰이 존재하지 않는 경우 예외가 발생한다. 
-      - 필수 인자(회원 ID, 내용)가 존재하지 않는 경우 예외가 발생한다.
-      - 토큰의 payload와 회원 ID가 일치하지 않는 경우 예외가 발생한다.
+      - 필수 인자(내용)가 존재하지 않는 경우 예외가 발생한다.
     - 조회
       - Todo List 조회
         - 액세스 토큰이 존재하지 않는 경우 예외가 발생한다.
-        - 필수 인자(회원 ID, 조회 페이지 번호)가 존재하지 않는 경우 예외가 발생한다.
-        - 토큰의 payload와 회원 ID가 일치하지 않는 경우 예외가 발생한다.
+        - 필수 인자(조회 할 페이지 번호)가 존재하지 않는 경우 예외가 발생한다.
         - TODO가 존재하지 않는 경우 빈 배열이 응답된다.
       - 가장 최근 Todo 상세 조회
         - 액세스 토큰이 존재하지 않는 경우 예외가 발생한다.
-        - 필수 인자(회원 ID)가 존재하지 않는 경우 예외가 발생한다.
-        - 토큰의 payload와 회원 ID가 일치하지 않는 경우 예외가 발생한다.
         - 최근 TODO가 존재하지 않는 경우 예외가 발생한다.
     - TODO 상태 변경 
       - 상태 정의
@@ -55,8 +51,8 @@
           - 대기 상태에서는 어떤 상태로든 변경할 수 있다.
       - 예외
         - 액세스 토큰이 존재하지 않는 경우 예외가 발생한다.
-        - 필수 인자(회원 ID, 할 일 ID, 변경할 상태)가 존재하지 않는 경우 예외가 발생한다.
-        - 토큰의 payload와 회원 ID가 일치하지 않는 경우 예외가 발생한다.
+        - 필수 인자(할 일 ID, 변경할 상태)가 존재하지 않는 경우 예외가 발생한다.
+        - 할 일의 MEMBER_ID와 변경자의 ID가 일치하지 않는 경우 예외가 발생한다.
         - 정의되지 않은 상태로 변경 요청을 하는 경우 예외가 발생한다.
         - 정의된 상태에서 변경 할 수 없는 경우 예외가 발생한다.
 - View
@@ -65,7 +61,7 @@
   - TODO CRU 관련 페이지
 
 ## ERD
-![스크린샷 2024-06-10 오후 10.15.05.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2Fmg%2Flsvk75352tgdjs7l8wrxm8w40000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_dFAJUE%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-06-10%20%EC%98%A4%ED%9B%84%2010.15.05.png)
+![erd](https://github.com/AiliartsuaL2/todo-list/assets/89395238/d559987a-f954-4321-91c0-1a304af8faac)
 
 ## API 명세
 
@@ -108,12 +104,12 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: POST
 
-    path: /api/v10/sign-up
+    path: /api/v10/members/sign-up
 
     body
-      - *loginId: 로그인시 사용할 ID
-      - *password: 로그인시 사용할 비밀번호
-      - *nickname: 서비스에서 사용할 닉네임
+      - *loginId: (String) 로그인시 사용할 ID
+      - *password: (String) 로그인시 사용할 비밀번호
+      - *nickname: (String) 서비스에서 사용할 닉네임
     ```
     
   - Response
@@ -133,11 +129,11 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: POST
 
-    path: /api/v10/sign-in
+    path: /api/v10/members/sign-in
 
     body
-      - *loginId: 로그인 ID
-      - *password: 비밀번호
+      - *loginId: (String) 로그인 ID
+      - *password: (String) 비밀번호
     ```
 
   - Response
@@ -161,12 +157,14 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: DELETE
   
-    path: /api/v10/member
+    path: /api/v10/members
+    
+    header:
+      - Authorization: Bearer {accessToken}
   
     body
-      - *memberId: 회원 ID
-      - *loginId: 로그인 ID
-      - *password: 비밀번호
+      - *loginId: (String) 로그인 ID
+      - *password: (String) 비밀번호
     ```
 
   - Response
@@ -186,11 +184,13 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: POST
   
-    path: /api/v10/todo
+    path: /api/v10/todos
+    
+    header:
+      - Authorization: Bearer {accessToken}
   
     body
-      - *memberId: 회원 ID
-      - *content: 할 일의 내용
+      - *content: (String) 할 일의 내용
     ```
 
   - Response
@@ -210,10 +210,12 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: GET
   
-    path: /api/v10/todo
+    path: /api/v10/todos
+
+    header:
+      - Authorization: Bearer {accessToken}
   
     query parameter
-      - *member_id: 회원 ID
       - *page_no: 조회 할 페이지 번호
     ```
 
@@ -258,10 +260,10 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: GET
   
-    path: /api/v10/recent/todo
+    path: /api/v10/todos/recent
   
-    query parameter
-      - *member_id: 회원 ID
+    header:
+      - Authorization: Bearer {accessToken}
     ```
 
   - Response
@@ -285,12 +287,14 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: PATCH
   
-    path: /api/v10/todo/{todoId}
+    path: /api/v10/todos/{todoId}
+      - *todoId: 변경할 할 일의 ID
+         
+    header:
+      - Authorization: Bearer {accessToken}
   
     body
-      - *memberId: 회원 ID
-      - *todoId: 할 일의 ID
-      - *status: 변경할 할 일의 상태
+      - *status: (String) 변경할 할 일의 상태
     ```
 
   - Response

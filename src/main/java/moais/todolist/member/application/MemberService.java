@@ -3,6 +3,7 @@ package moais.todolist.member.application;
 import lombok.RequiredArgsConstructor;
 import moais.todolist.global.auth.application.usecase.CreateTokenUseCase;
 import moais.todolist.global.auth.domain.Token;
+import moais.todolist.global.auth.presentation.dto.request.CreateUserAccountEvent;
 import moais.todolist.member.application.dto.request.SignInRequestDto;
 import moais.todolist.member.application.dto.request.SignUpRequestDto;
 import moais.todolist.member.application.dto.request.WithdrawRequestDto;
@@ -13,23 +14,31 @@ import moais.todolist.member.application.usecase.WithdrawUseCase;
 import moais.todolist.member.domain.Member;
 import moais.todolist.member.exception.ErrorMessage;
 import moais.todolist.member.persistence.MemberRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseCase {
 
     private final MemberRepository memberRepository;
     private final CreateTokenUseCase createTokenUseCase;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public void signUp(SignUpRequestDto requestDto) {
         if (memberRepository.findMemberByLoginId(requestDto.loginId()).isPresent()) {
             throw new IllegalStateException(ErrorMessage.ALREADY_EXIST_LOGIN_ID.getMessage());
         }
         Member member = requestDto.toEntity();
         memberRepository.save(member);
+
+        // 회원가입 이벤트 발행 -> UserAccount 생성
+        eventPublisher.publishEvent(new CreateUserAccountEvent(member.getId()));
     }
 
     @Override
@@ -42,6 +51,7 @@ public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseC
     }
 
     @Override
+    @Transactional
     public void withdraw(WithdrawRequestDto requestDto, String payload) {
         if (ObjectUtils.isEmpty(payload)) {
             throw new IllegalArgumentException(ErrorMessage.NOT_EXIST_PAYLOAD.getMessage());

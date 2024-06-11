@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.mockito.BDDMockito.then;
@@ -13,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import moais.todolist.global.auth.application.usecase.CreateTokenUseCase;
 import moais.todolist.global.auth.domain.Token;
+import moais.todolist.global.auth.presentation.dto.request.CreateUserAccountEvent;
 import moais.todolist.member.application.dto.request.SignInRequestDto;
 import moais.todolist.member.application.dto.request.SignUpRequestDto;
 import moais.todolist.member.application.dto.request.WithdrawRequestDto;
@@ -24,6 +24,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 class MemberServiceTest {
 
@@ -37,7 +38,8 @@ class MemberServiceTest {
 
     private final MemberRepository memberRepository = mock(MemberRepository.class);
     private final CreateTokenUseCase createTokenUseCase = mock(CreateTokenUseCase.class);
-    private final MemberService memberService = new MemberService(memberRepository, createTokenUseCase);
+    ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+    private final MemberService memberService = new MemberService(memberRepository, createTokenUseCase, eventPublisher);
 
     @Nested
     @DisplayName("회원 가입 테스트")
@@ -58,7 +60,7 @@ class MemberServiceTest {
         }
 
         @Test
-        @DisplayName("정상 상태의 요청인 경우 회원이 저장된다.")
+        @DisplayName("정상 상태의 요청인 경우 회원이 저장되고, 이벤트가 발행된다.")
         void test2() {
             // given
             SignUpRequestDto requestDto = new SignUpRequestDto(NICKNAME, LOGIN_ID, PASSWORD);
@@ -72,6 +74,10 @@ class MemberServiceTest {
             then(memberRepository)
                     .should(times(1))
                     .save(any(Member.class));
+
+            then(eventPublisher)
+                    .should(times(1))
+                    .publishEvent(any(CreateUserAccountEvent.class));
         }
     }
 

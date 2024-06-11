@@ -18,3 +18,8 @@ spring:
         format_sql: true
         connection:
           charSet: UTF-8
+jwt:
+  secret-key: moais-secret-key
+  expired-time:
+    access-token-min: 30
+    refresh-token-day: 14

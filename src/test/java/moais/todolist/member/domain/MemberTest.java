@@ -76,8 +76,40 @@ class MemberTest {
         }
 
         @Test
-        @DisplayName("정상 생성시 입력 필드가 매핑되고, 삭제여부 컬럼이 False가 된다.")
+        @DisplayName("로그인 ID 입력이 최대 길이(30자)가 넘어가는 경우 예외가 발생한다.")
         void test4() {
+            // given
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < 50; i++) {
+                stringBuilder.append(".");
+            }
+            String loginId = stringBuilder.toString();
+
+            // when & then
+            assertThatThrownBy(() -> new Member(NICKNAME, loginId, PASSWORD))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(ErrorMessage.OVER_THAN_MAX_SIZE_AT_LOGIN_ID.getMessage());
+        }
+
+        @Test
+        @DisplayName("닉네임의 입력이 최대 길이(30자)가 넘어가는 경우 예외가 발생한다.")
+        void test5() {
+            // given
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < 50; i++) {
+                stringBuilder.append(".");
+            }
+            String nickname = stringBuilder.toString();
+
+            // when & then
+            assertThatThrownBy(() -> new Member(nickname, LOGIN_ID, PASSWORD))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(ErrorMessage.OVER_THAN_MAX_SIZE_AT_NICKNAME.getMessage());
+        }
+
+        @Test
+        @DisplayName("정상 생성시 입력 필드가 매핑되고, 삭제여부 컬럼이 False가 된다.")
+        void test6() {
             // given & when
             Member member = new Member(NICKNAME, LOGIN_ID, PASSWORD);
 

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import moais.todolist.global.dto.ApiCommonResponse;
 import moais.todolist.global.dto.ErrorMessage;
 import moais.todolist.global.exception.EmptyTokenException;
+import moais.todolist.global.exception.PermissionDeniedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -52,6 +53,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmptyTokenException.class)
     public ResponseEntity<ApiCommonResponse<ErrorMessage>> emptyTokenException(EmptyTokenException ex){
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        return writeLogTraceAndResponse(status, ex);
+    }
+
+    @ExceptionHandler(PermissionDeniedException.class)
+    public ResponseEntity<ApiCommonResponse<ErrorMessage>> permissionDeniedException(PermissionDeniedException ex){
+        HttpStatus status = HttpStatus.FORBIDDEN;
         return writeLogTraceAndResponse(status, ex);
     }
 

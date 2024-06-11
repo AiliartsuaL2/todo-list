@@ -1,5 +1,8 @@
 package moais.todolist.member.domain;
 
+import static moais.todolist.member.utils.PasswordUtils.B_CRYPT_PASSWORD_ENCODER;
+import static moais.todolist.member.utils.PasswordUtils.PASSWORD_PATTERN;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -14,15 +17,12 @@ import lombok.NoArgsConstructor;
 import moais.todolist.global.domain.BaseEntity;
 import moais.todolist.global.domain.converter.BooleanToYNConverter;
 import moais.todolist.member.exception.ErrorMessage;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "MEMBER")
 public class Member extends BaseEntity {
-
-    private static final BCryptPasswordEncoder B_CRYPT_PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,14 +45,35 @@ public class Member extends BaseEntity {
     private LocalDateTime deletedAt;
 
     public Member(String nickname, String loginId, String password) {
-        notNullValidation(nickname, ErrorMessage.NOT_EXIST_NICKNAME.getMessage());
-        notNullValidation(loginId, ErrorMessage.NOT_EXIST_LOGIN_ID.getMessage());
-        notNullValidation(password, ErrorMessage.NOT_EXIST_PASSWORD.getMessage());
+        validateNicknameInput(nickname);
+        validateLoginIdInput(loginId);
+        validatePasswordInput(password);
 
         this.nickname = nickname;
         this.loginId = loginId;
         this.password = B_CRYPT_PASSWORD_ENCODER.encode(password);
         this.deleteYn = Boolean.FALSE;
+    }
+
+    private void validatePasswordInput(String password) {
+        notNullValidation(password, ErrorMessage.NOT_EXIST_PASSWORD.getMessage());
+        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            throw new IllegalArgumentException(ErrorMessage.INVALID_PASSWORD_REGEX.getMessage());
+        }
+    }
+
+    private void validateLoginIdInput(String loginId) {
+        notNullValidation(loginId, ErrorMessage.NOT_EXIST_LOGIN_ID.getMessage());
+        if (loginId.length() > 30) {
+            throw new IllegalArgumentException(ErrorMessage.OVER_THAN_MAX_SIZE_AT_LOGIN_ID.getMessage());
+        }
+    }
+
+    private void validateNicknameInput(String nickname) {
+        notNullValidation(nickname, ErrorMessage.NOT_EXIST_NICKNAME.getMessage());
+        if (nickname.length() > 30) {
+            throw new IllegalArgumentException(ErrorMessage.OVER_THAN_MAX_SIZE_AT_NICKNAME.getMessage());
+        }
     }
 
     public String signIn(String password) {

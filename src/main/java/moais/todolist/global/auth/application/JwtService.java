@@ -46,7 +46,6 @@ public class JwtService implements CreateTokenUseCase, ExtractPayloadUseCase, Re
     @Override
     public String renewAccessToken(String refreshToken) {
         validateExistToken(refreshToken);
-        refreshToken = refreshToken.replace(TOKEN_PREFIX, ""); // Bearer 제거
         String payload = getTokenInfoProvider.getPayload(refreshToken);
         return createTokenProvider.createAccessToken(payload);
     }

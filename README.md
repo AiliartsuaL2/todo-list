@@ -101,7 +101,7 @@ ex) Authorization: Bearer {accessToken}
 ```
 
 - *는 필수 입력 필드 입니다.
-- 회원가입
+- 회원가입 API
   - Request
     ```markdown
     method: POST
@@ -126,7 +126,7 @@ ex) Authorization: Bearer {accessToken}
         }
       }
       ```
-- 로그인
+- 로그인 API
   - Request
     ```markdown
     method: POST
@@ -154,7 +154,7 @@ ex) Authorization: Bearer {accessToken}
         }
       }
       ```
-- 회원탈퇴
+- 회원탈퇴 API
   - Request
     ```markdown
     method: DELETE
@@ -179,7 +179,30 @@ ex) Authorization: Bearer {accessToken}
         }
       }
       ```
-- TODO 추가
+- 액세스 토큰 재발급 API
+  - Request
+    ```markdown
+    method: POST
+  
+    path: /api/v10/token/refresh
+    
+    body:
+      - *refreshToken: (String) 로그인시 발급 받은 리프레시 토큰
+    ```
+
+  - Response
+    - Http Status
+      - 200 OK
+    - Body
+      ```json
+      {
+        "success": true,
+        "result": {
+          "accessToken": "{accessToken}"
+        }
+      }
+      ```
+- TODO 추가 API
   - Request
     ```markdown
     method: POST
@@ -203,7 +226,7 @@ ex) Authorization: Bearer {accessToken}
         }
       }
       ```
-- TODO 리스트 조회
+- TODO 리스트 조회 API
   - Request
     ```markdown
     method: GET
@@ -251,7 +274,7 @@ ex) Authorization: Bearer {accessToken}
         }
       }
       ```
-- 가장 최근 TODO 조회
+- 가장 최근 TODO 조회 API
   - Request
     ```markdown
     method: GET
@@ -278,7 +301,7 @@ ex) Authorization: Bearer {accessToken}
         }
       }
       ```
-- TODO 상태 변경
+- TODO 상태 변경 API
   - Request
     ```markdown
     method: PATCH

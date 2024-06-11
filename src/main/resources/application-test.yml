@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:./data/test;MODE=MySQL;TRACE_LEVEL_SYSTEM_OUT=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto : create
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    database: h2
+    properties:
+      hibernate:
+        format_sql: true
+        connection:
+          charSet: UTF-8
+jwt:
+  secret-key: moais-secret-key
+  expired-time:
+    access-token-min: 30
+    refresh-token-day: 14

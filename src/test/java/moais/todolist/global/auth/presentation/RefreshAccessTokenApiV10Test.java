@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = JwtAuthenticationEntryPoint.class)}
 )
 class RefreshAccessTokenApiV10Test {
-    private static final String PATH = "/api/v1.0/token/refresh";
+    private static final String PATH = "/api/v10/token/refresh";
 
     @Autowired
     private MockMvc mockMvc;
@@ -55,7 +55,7 @@ class RefreshAccessTokenApiV10Test {
     @DisplayName("정상 요청시, Status 200, access Token이 발급된다.")
     void test2() throws Exception {
         // given
-        String requestRefreshToken = "Bearer refreshToken";
+        String requestRefreshToken = "refreshToken";
         String accessToken = "accessToken";
 
         RefreshAccessTokenResponseDto tokenResponseDto = new RefreshAccessTokenResponseDto(accessToken);
@@ -67,8 +67,8 @@ class RefreshAccessTokenApiV10Test {
 
         // when
         String response = mockMvc.perform(post(PATH)
-                        .header("Authorization", requestRefreshToken)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"" + requestRefreshToken + "\"}")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andReturn()

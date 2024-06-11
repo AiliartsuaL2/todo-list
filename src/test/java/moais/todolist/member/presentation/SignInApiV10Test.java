@@ -1,12 +1,18 @@
-package moais.todolist.global.auth.presentation;
+package moais.todolist.member.presentation;
 
-import com.google.gson.Gson;
-import moais.todolist.global.auth.application.usecase.RenewAccessTokenUseCase;
-import moais.todolist.global.auth.presentation.dto.response.RefreshAccessTokenResponseDto;
-import moais.todolist.global.dto.ApiCommonResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import moais.todolist.global.auth.domain.Token;
 import moais.todolist.global.handler.JwtAccessDeniedHandler;
 import moais.todolist.global.handler.JwtAuthenticationEntryPoint;
 import moais.todolist.global.handler.JwtExceptionFilter;
+import moais.todolist.member.application.dto.response.SignInResponseDto;
+import moais.todolist.member.application.usecase.SignInUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,30 +24,24 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(
-        controllers = RefreshAccessTokenApiV10.class,
+        controllers = SignInApiV10.class,
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = JwtExceptionFilter.class),
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = JwtAccessDeniedHandler.class),
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = JwtAuthenticationEntryPoint.class)}
 )
-class RefreshAccessTokenApiV10Test {
-    private static final String PATH = "/api/v10/token/refresh";
+class SignInApiV10Test {
+    private static final String PATH = "/api/v10/members/sign-in";
 
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    RenewAccessTokenUseCase renewAccessTokenUseCase;
+    SignInUseCase signInUseCase;
 
     @Test
-    @DisplayName("RefreshToken 미존재시 400이 응답된다.")
+    @DisplayName("Body 미존재시 400이 응답된다.")
     void test1() throws Exception {
         // given & when & then
         mockMvc.perform(post(PATH)
@@ -51,30 +51,32 @@ class RefreshAccessTokenApiV10Test {
     }
 
     @Test
-    @DisplayName("정상 요청시, Status 200, access Token이 발급된다.")
+    @DisplayName("정상 요청시, Status는 200, Body에는 accessToken, refreshToken, memberId가 반한된다.")
     void test2() throws Exception {
         // given
-        String requestRefreshToken = "refreshToken";
         String accessToken = "accessToken";
+        String refreshToken = "refreshToken";
+        String memberId = "memberId";
+        SignInResponseDto responseDto = new SignInResponseDto(memberId, new Token(accessToken, refreshToken));
+        when(signInUseCase.signIn(any()))
+                .thenReturn(responseDto);
+        String requestJson ="{"
+                + "\"loginId\": \"loginId\","
+                + "\"password\": \"password\""
+                + "}";
 
-        RefreshAccessTokenResponseDto tokenResponseDto = new RefreshAccessTokenResponseDto(accessToken);
-        ApiCommonResponse<RefreshAccessTokenResponseDto> responseDto = new ApiCommonResponse<>(true, tokenResponseDto);
-        String responseJson = new Gson().toJson(responseDto);
-
-        when(renewAccessTokenUseCase.renewAccessToken(requestRefreshToken))
-                .thenReturn(accessToken);
-
-        // when
+        // when & then
         String response = mockMvc.perform(post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"refreshToken\":\"" + requestRefreshToken + "\"}")
+                        .content(requestJson)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andReturn()
-                .getResponse().getContentAsString();
+                .getResponse()
+                .getContentAsString();
 
-        // then
-        assertThat(response)
-                .isEqualTo(responseJson);
+        assertThat(response).contains(memberId);
+        assertThat(response).contains(accessToken);
+        assertThat(response).contains(refreshToken);
     }
 }

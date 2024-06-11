@@ -24,10 +24,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] SIGN_WHITELIST = {
-            "/api/v1.0/sign-in",
-            "/api/v1.0/sign-up",
-            "/api/v1.0/token/refresh"
+    private static final String[] AUTH_WHITELIST = {
+            "/api/v10/members/sign-in",
+            "/api/v10/members/sign-up",
+            "/api/v10/token/refresh"
     };
 
     private static final String AUTHENTICATION_TEST_URL = "/api/v1/auth/not-use/test";
@@ -45,7 +45,7 @@ public class SecurityConfig {
         http
                 .csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(SIGN_WHITELIST).permitAll()
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers(AUTHENTICATION_TEST_URL).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e ->

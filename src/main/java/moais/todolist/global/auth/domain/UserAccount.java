@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import moais.todolist.global.domain.BaseEntity;
+import moais.todolist.global.domain.converter.RoleTypeConverter;
 import moais.todolist.global.exception.ErrorMessage;
 import moais.todolist.member.domain.RoleType;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,7 +29,8 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Column(nullable = false, length = 36)
     private String memberId;
 
-    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Convert(converter = RoleTypeConverter.class)
     private RoleType roleType;
 
     public UserAccount(String memberId, String roleType) {
@@ -53,5 +55,4 @@ public class UserAccount extends BaseEntity implements UserDetails {
     public String getUsername() {
         return String.valueOf(this.memberId);
     }
-
 }

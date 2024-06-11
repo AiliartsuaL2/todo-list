@@ -20,6 +20,8 @@ public class RefreshAccessTokenApiV10 {
     @PostMapping("/token/refresh")
     public ResponseEntity<ApiCommonResponse<RefreshAccessTokenResponseDto>> renewAccessToken(@RequestBody RenewAccessTokenRequestDto requestDto) {
         String accessToken = renewAccessTokenUseCase.renewAccessToken(requestDto.refreshToken());
-        return ResponseEntity.ok(new ApiCommonResponse<>(new RefreshAccessTokenResponseDto(accessToken), true));
+        RefreshAccessTokenResponseDto responseDto = new RefreshAccessTokenResponseDto(accessToken);
+        ApiCommonResponse<RefreshAccessTokenResponseDto> response = new ApiCommonResponse<>(true, responseDto);
+        return ResponseEntity.ok(response);
     }
 }

@@ -12,8 +12,10 @@
 - 주요 서비스 흐름에 따른 따른 로깅
 - 회원은 닉네임을 가진다.
 - 보안이 고려되어 있어야 한다.
-  - ID UUID화 (SQL Injection 방어)  
+  - ID UUID화 (Injection 방어)
+  - JWT 인증
   - 비밀번호 단방향 암호화
+  - 비밀번호 정책
 
 ### 기능 요구사항
 - API
@@ -90,23 +92,23 @@ ex) Authorization: Bearer {accessToken}
 - 정상 응답
 ```json
 {
+    "success": true,
     "result": { 
       result
-    },
-    "success": true
+    }
 }
 ```
 - 예외 응답
 ```json
 {
+    "success": false,
     "result": { 
       "errorMessage": "예외 메세지"
-    },
-    "success": false
+    }
 }
 ```
 
-- *는 필수 입력 필드 입니다.
+- *는 필수 필드 입니다.
 - 회원가입 API
   - Request
     ```markdown
@@ -128,7 +130,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "message": "회원 가입에 성공하였습니다."
+          *"message": "회원 가입에 성공하였습니다."
         }
       }
       ```
@@ -152,10 +154,10 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "memberId": {memberId},
+          *"memberId": {memberId}, (String)
           "token": {
-            "accessToken": {accessToken},
-            "refreshToken": {refreshToken}
+            *"accessToken": {accessToken}, (String, header.payload.signature) 액세스 토큰
+            *"refreshToken": {refreshToken} (String, header.payload.signature) 리프레시 토큰
           }
         }
       }
@@ -167,8 +169,8 @@ ex) Authorization: Bearer {accessToken}
   
     path: /api/v10/members
     
-    header:
-      - Authorization: Bearer {accessToken}
+    *header:
+      - *Authorization: Bearer {accessToken}
   
     body
       - *loginId: (String) 로그인 ID
@@ -183,7 +185,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "message": "회원 탈퇴가 정상적으로 처리되었습니다."
+          *"message": "회원 탈퇴가 정상적으로 처리되었습니다."
         }
       }
       ```
@@ -206,7 +208,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "accessToken": "{accessToken}"
+          "accessToken": "{accessToken}" (String, header.payload.signature) 액세스 토큰
         }
       }
       ```
@@ -217,8 +219,8 @@ ex) Authorization: Bearer {accessToken}
   
     path: /api/v10/todos
     
-    header:
-      - Authorization: Bearer {accessToken}
+    *header:
+      - *Authorization: Bearer {accessToken}
   
     body
       - *content: (String) 할 일의 내용
@@ -232,7 +234,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "message": "할 일이 정상적으로 등록되었습니다."
+          *"message": "할 일이 정상적으로 등록되었습니다."
         }
       }
       ```
@@ -243,8 +245,8 @@ ex) Authorization: Bearer {accessToken}
   
     path: /api/v10/todos
 
-    header:
-      - Authorization: Bearer {accessToken}
+    *header:
+      - *Authorization: Bearer {accessToken}
   
     query parameter
       - *page_no: 조회 할 페이지 번호
@@ -258,14 +260,14 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "count": 123,
-          "todos": [
+          *"count": 123,
+          *"todos": [
             {
-              "todoId": "{todoID}",
-              "content": "{content}",
-              "status": "{status}",
-              "createdAt": "{createdAt}",
-              "updatedAt": "{updatedAt}"
+              *"todoId": "{todoID}", (String), Todo ID
+              *"content": "{content}", (String), 내용
+              *"status": "{status}", (String), Todo 상태 (한국어)
+              *"createdAt": "{createdAt}", (String, yyyy-MM-dd hh:mm), 생성일시
+              "updatedAt": "{updatedAt}" (String, yyyy-MM-dd hh:mm), 수정일시
             },
             {
               "todoId": "{todoID}",
@@ -279,8 +281,8 @@ ex) Authorization: Bearer {accessToken}
               "todoId": "{todoID}",
               "content": "{content}",
               "status": "{status}",
-              "createdAt": "{createdAt}",
-              "updatedAt": "{updatedAt}"
+              "createdAt": "{createdAt}", 
+              "updatedAt": "{updatedAt}" 
             }
           ] 
         }
@@ -293,8 +295,8 @@ ex) Authorization: Bearer {accessToken}
   
     path: /api/v10/todos/recent
   
-    header:
-      - Authorization: Bearer {accessToken}
+    *header:
+      - *Authorization: Bearer {accessToken}
     ```
 
   - Response
@@ -305,11 +307,11 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "todoId": "{todoID}",
-          "content": "{content}",
-          "status": "{status}",
-          "createdAt": "{createdAt}", (yyyy-MM-dd hh:mm)
-          "updatedAt": "{updatedAt}" (yyyy-MM-dd hh:mm)
+            *"todoId": "{todoID}", (String), Todo ID
+            *"content": "{content}", (String), 내용
+            *"status": "{status}", (String), Todo 상태 (한국어)
+            *"createdAt": "{createdAt}", (String, yyyy-MM-dd hh:mm), 생성일시
+            "updatedAt": "{updatedAt}" (String, yyyy-MM-dd hh:mm), 수정일시
         }
       }
       ```
@@ -318,10 +320,10 @@ ex) Authorization: Bearer {accessToken}
     ```markdown
     method: PATCH
   
-    path: /api/v10/todos/{todoId}
+    path: /api/v10/todos/status/{todoId}
       - *todoId: 변경할 할 일의 ID
          
-    header:
+    *header:
       - Authorization: Bearer {accessToken}
   
     body
@@ -336,7 +338,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          "message": "할 일의 상태가 정상적으로 변경되었습니다."
+          *"message": "할 일의 상태가 정상적으로 변경되었습니다."
         }
       }
       ```

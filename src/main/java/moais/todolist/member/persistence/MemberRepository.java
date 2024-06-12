@@ -5,5 +5,5 @@ import moais.todolist.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
-    Optional<Member> findMemberByLoginId(String loginId);
+    Optional<Member> findMemberByLoginIdAndDeleteYnIsFalse(String loginId);
 }

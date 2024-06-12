@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import moais.todolist.global.auth.application.usecase.CreateTokenUseCase;
 import moais.todolist.global.auth.domain.Token;
 import moais.todolist.global.auth.presentation.dto.request.CreateUserAccountEvent;
+import moais.todolist.global.auth.presentation.dto.request.DeleteUserAccountEvent;
 import moais.todolist.member.application.dto.request.SignInRequestDto;
 import moais.todolist.member.application.dto.request.SignUpRequestDto;
 import moais.todolist.member.application.dto.request.WithdrawRequestDto;
@@ -25,13 +26,15 @@ import org.springframework.util.ObjectUtils;
 public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseCase {
 
     private final MemberRepository memberRepository;
+
     private final CreateTokenUseCase createTokenUseCase;
+
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
     public void signUp(SignUpRequestDto requestDto) {
-        if (memberRepository.findMemberByLoginId(requestDto.loginId()).isPresent()) {
+        if (memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId()).isPresent()) {
             throw new IllegalStateException(ErrorMessage.ALREADY_EXIST_LOGIN_ID.getMessage());
         }
         Member member = requestDto.toEntity();
@@ -43,7 +46,7 @@ public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseC
 
     @Override
     public SignInResponseDto signIn(SignInRequestDto requestDto) {
-        Member member = memberRepository.findMemberByLoginId(requestDto.loginId())
+        Member member = memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId())
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.NOT_EXIST_MEMBER.getMessage()));
         String memberId = member.signIn(requestDto.password());
         Token token = createTokenUseCase.create(memberId);
@@ -56,10 +59,13 @@ public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseC
         if (ObjectUtils.isEmpty(payload)) {
             throw new IllegalArgumentException(ErrorMessage.NOT_EXIST_PAYLOAD.getMessage());
         }
-        Member member = memberRepository.findMemberByLoginId(requestDto.loginId())
+        Member member = memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId())
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.NOT_EXIST_MEMBER.getMessage()));
 
         // 토큰의 payload와 비교
         member.withdraw(payload, requestDto.loginId(), requestDto.password());
+
+        // 회원 탈퇴시 UserAccount 삭제 이벤트 발행
+        eventPublisher.publishEvent(new DeleteUserAccountEvent(member.getId()));
     }
 }

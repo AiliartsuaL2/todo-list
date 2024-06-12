@@ -35,9 +35,9 @@ public enum ErrorMessage {
 
     NOT_EXIST_ROLE_TYPE("존재하지 않는 RoleType 입니다."),
 
-    NOT_EXIST_USER_ACCOUNT("사용자 정보가 존재하지 않습니다.");
+    NOT_EXIST_USER_ACCOUNT("사용자 정보가 존재하지 않습니다."),
 
-
+    ALREADY_EXIST_USER_ACCOUNT("이미 존재하는 계정 정보 입니다.");
 
     private final String message;
 }

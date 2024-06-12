@@ -13,6 +13,7 @@ import java.util.UUID;
 import moais.todolist.global.auth.application.usecase.CreateTokenUseCase;
 import moais.todolist.global.auth.domain.Token;
 import moais.todolist.global.auth.presentation.dto.request.CreateUserAccountEvent;
+import moais.todolist.global.auth.presentation.dto.request.DeleteUserAccountEvent;
 import moais.todolist.member.application.dto.request.SignInRequestDto;
 import moais.todolist.member.application.dto.request.SignUpRequestDto;
 import moais.todolist.member.application.dto.request.WithdrawRequestDto;
@@ -50,7 +51,7 @@ class MemberServiceTest {
         void test1() {
             // given
             SignUpRequestDto requestDto = new SignUpRequestDto(NICKNAME, LOGIN_ID, PASSWORD);
-            when(memberRepository.findMemberByLoginId(requestDto.loginId()))
+            when(memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId()))
                     .thenReturn(Optional.of(mock(Member.class)));
 
             // when & then
@@ -64,7 +65,7 @@ class MemberServiceTest {
         void test2() {
             // given
             SignUpRequestDto requestDto = new SignUpRequestDto(NICKNAME, LOGIN_ID, PASSWORD);
-            when(memberRepository.findMemberByLoginId(requestDto.loginId()))
+            when(memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId()))
                     .thenReturn(Optional.empty());
 
             // when
@@ -90,7 +91,7 @@ class MemberServiceTest {
         void test1() {
             // given
             SignInRequestDto requestDto = new SignInRequestDto(LOGIN_ID, PASSWORD);
-            when(memberRepository.findMemberByLoginId(requestDto.loginId()))
+            when(memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId()))
                     .thenReturn(Optional.empty());
 
             // when & then
@@ -109,7 +110,7 @@ class MemberServiceTest {
                     .thenReturn(MEMBER_ID);
             when(createTokenUseCase.create(MEMBER_ID))
                     .thenReturn(TOKEN);
-            when(memberRepository.findMemberByLoginId(requestDto.loginId()))
+            when(memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId()))
                     .thenReturn(Optional.of(member));
 
             // when
@@ -143,7 +144,7 @@ class MemberServiceTest {
         void test2() {
             // given
             WithdrawRequestDto requestDto = new WithdrawRequestDto(LOGIN_ID, PASSWORD);
-            when(memberRepository.findMemberByLoginId(requestDto.loginId()))
+            when(memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId()))
                     .thenReturn(Optional.empty());
 
             // when & then
@@ -153,14 +154,14 @@ class MemberServiceTest {
         }
 
         @Test
-        @DisplayName("정상 요청시 withdraw 메서드가 실행된다.")
+        @DisplayName("정상 요청시 withdraw 메서드가 실행되고, 이벤트가 발행된다.")
         void test3() {
             // given
             WithdrawRequestDto requestDto = new WithdrawRequestDto(LOGIN_ID, PASSWORD);
             Member member = mock(Member.class);
             when(member.getId())
                     .thenReturn(MEMBER_ID);
-            when(memberRepository.findMemberByLoginId(requestDto.loginId()))
+            when(memberRepository.findMemberByLoginIdAndDeleteYnIsFalse(requestDto.loginId()))
                     .thenReturn(Optional.of(member));
 
             // when
@@ -170,6 +171,10 @@ class MemberServiceTest {
             then(member)
                     .should(times(1))
                     .withdraw(MEMBER_ID, requestDto.loginId(), requestDto.password());
+
+            then(eventPublisher)
+                    .should(times(1))
+                    .publishEvent(any(DeleteUserAccountEvent.class));
         }
     }
 }

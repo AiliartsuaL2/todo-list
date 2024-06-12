@@ -308,8 +308,8 @@ ex) Authorization: Bearer {accessToken}
           "todoId": "{todoID}",
           "content": "{content}",
           "status": "{status}",
-          "createdAt": "{createdAt}", (yyyy.MM.dd.hh.mm)
-          "updatedAt": "{updatedAt}" (yyyy.MM.dd.hh.mm)
+          "createdAt": "{createdAt}", (yyyy-MM-dd hh:mm)
+          "updatedAt": "{updatedAt}" (yyyy-MM-dd hh:mm)
         }
       }
       ```

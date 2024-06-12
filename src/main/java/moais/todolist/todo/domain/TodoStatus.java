@@ -8,7 +8,7 @@ import moais.todolist.todo.exception.ErrorMessage;
 @Getter
 public enum TodoStatus {
     TODO("todo", "TODO", "할 일"),
-    IN_PROGRESS("inProgress", "IN PROGRESS", "진행중"),
+    IN_PROGRESS("inProgress", "IN PROGRESS", "진행 중"),
     DONE("done", "DONE", "완료"),
     PENDING("pending", "PENDING", "대기");
 

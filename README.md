@@ -259,7 +259,7 @@ ex) Authorization: Bearer {accessToken}
         "success": true,
         "result": {
           "count": 123,
-          "todo": [
+          "todos": [
             {
               "todoId": "{todoID}",
               "content": "{content}",
@@ -308,8 +308,8 @@ ex) Authorization: Bearer {accessToken}
           "todoId": "{todoID}",
           "content": "{content}",
           "status": "{status}",
-          "createdAt": "{createdAt}",
-          "updatedAt": "{updatedAt}"  
+          "createdAt": "{createdAt}", (yyyy.MM.dd.hh.mm)
+          "updatedAt": "{updatedAt}" (yyyy.MM.dd.hh.mm)
         }
       }
       ```

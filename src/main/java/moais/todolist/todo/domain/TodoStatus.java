@@ -16,10 +16,18 @@ public enum TodoStatus {
     private final String persistValue;
     private final String name;
 
-
     public static TodoStatus findByValue(String value) {
         for (TodoStatus todoStatus : values()) {
             if (todoStatus.value.equals(value)) {
+                return todoStatus;
+            }
+        }
+        throw new IllegalArgumentException(ErrorMessage.NOT_EXIST_TODO_STATUS.getMessage());
+    }
+
+    public static TodoStatus findByPersistValue(String persistValue) {
+        for (TodoStatus todoStatus : values()) {
+            if (todoStatus.persistValue.equals(persistValue)) {
                 return todoStatus;
             }
         }

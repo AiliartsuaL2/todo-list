@@ -1,17 +1,12 @@
 package moais.todolist.todo.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import moais.todolist.global.domain.BaseEntity;
 import moais.todolist.global.exception.PermissionDeniedException;
+import moais.todolist.todo.domain.converter.TodoStatusConverter;
 import moais.todolist.todo.exception.ErrorMessage;
 
 @Entity
@@ -29,6 +24,7 @@ public class Todo extends BaseEntity {
     private String content;
 
     @Column(nullable = false, length = 20)
+    @Convert(converter = TodoStatusConverter.class)
     private TodoStatus status;
 
     @Column(nullable = false, length = 36)

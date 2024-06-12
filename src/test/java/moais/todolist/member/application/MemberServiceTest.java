@@ -31,7 +31,7 @@ class MemberServiceTest {
     private static final String MEMBER_ID = UUID.randomUUID().toString();
     private static final String NICKNAME = "nickname";
     private static final String LOGIN_ID = "loginId";
-    private static final String PASSWORD = "password";
+    private static final String PASSWORD = "password123!";
     private static final String ACCESS_TOKEN = "accessToken";
     private static final String REFRESH_TOKEN = "refreshToken";
     private static final Token TOKEN = new Token(ACCESS_TOKEN, REFRESH_TOKEN);

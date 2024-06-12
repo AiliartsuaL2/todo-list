@@ -11,7 +11,7 @@ class SignUpRequestDtoTest {
 
     private static final String NICKNAME = "nickname";
     private static final String LOGIN_ID = "loginId";
-    private static final String PASSWORD = "password";
+    private static final String PASSWORD = "password123!";
 
     @Test
     @DisplayName("필수 인자 - 로그인 ID 미존재시 예외가 발생한다.")

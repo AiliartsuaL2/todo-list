@@ -16,7 +16,7 @@ class MemberTest {
     private static final String MEMBER_ID = UUID.randomUUID().toString();
     private static final String NICKNAME = "nickname";
     private static final String LOGIN_ID = "loginId";
-    private static final String PASSWORD = "password";
+    private static final String PASSWORD = "password123!";
     private static final Member MEMBER = new Member(NICKNAME, LOGIN_ID, PASSWORD);
 
     @Nested
@@ -108,8 +108,44 @@ class MemberTest {
         }
 
         @Test
-        @DisplayName("정상 생성시 입력 필드가 매핑되고, 삭제여부 컬럼이 False가 된다.")
+        @DisplayName("비밀번호 입력 중 특수문자가 없으면 예외가 발생한다.")
         void test6() {
+            // given
+            String password = "password123";
+
+            // when & then
+            assertThatThrownBy(() -> new Member(NICKNAME, LOGIN_ID, password))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(ErrorMessage.INVALID_PASSWORD_REGEX.getMessage());
+        }
+
+        @Test
+        @DisplayName("비밀번호 입력 중 영어 소문자가 없으면 예외가 발생한다.")
+        void test7() {
+            // given
+            String password = "12345678!";
+
+            // when & then
+            assertThatThrownBy(() -> new Member(NICKNAME, LOGIN_ID, password))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(ErrorMessage.INVALID_PASSWORD_REGEX.getMessage());
+        }
+
+        @Test
+        @DisplayName("비밀번호 입력이 8자리 미만인 경우 예외가 발생한다.")
+        void test8() {
+            // given
+            String password = "a123!";
+
+            // when & then
+            assertThatThrownBy(() -> new Member(NICKNAME, LOGIN_ID, password))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(ErrorMessage.INVALID_PASSWORD_REGEX.getMessage());
+        }
+
+        @Test
+        @DisplayName("정상 생성시 입력 필드가 매핑되고, 삭제여부 컬럼이 False가 된다.")
+        void test9() {
             // given & when
             Member member = new Member(NICKNAME, LOGIN_ID, PASSWORD);
 

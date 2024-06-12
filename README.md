@@ -68,7 +68,17 @@
 - View
   - 회원가입 페이지
   - 로그인 페이지
-  - TODO CRU 관련 페이지
+    - 회원가입 페이지 이동
+  - 메인 페이지
+    - TODO 목록 이동
+    - 최근 TODO 조회
+    - 회원 탈퇴
+    - 로그아웃
+  - TODO 목록 페이지
+    - TODO 생성
+    - TODO 목록 조회
+      - TODO 수정
+    - 메인 페이지 이동
 
 ## ERD
 ![todo-list](./src/main/resources/image/todo-list.png)
@@ -130,7 +140,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          *"message": "회원 가입에 성공하였습니다."
+          "message": "회원 가입에 성공하였습니다."
         }
       }
       ```
@@ -150,18 +160,23 @@ ex) Authorization: Bearer {accessToken}
     - Http Status
       - 200 OK
     - Body
-      ```json
-      {
-        "success": true,
-        "result": {
-          *"memberId": {memberId}, (String)
-          "token": {
-            *"accessToken": {accessToken}, (String, header.payload.signature) 액세스 토큰
-            *"refreshToken": {refreshToken} (String, header.payload.signature) 리프레시 토큰
+      - *memberId: (String) 회원의 ID 입니다. 
+      - *token
+        - *accessToken: (String, header.payload.signature) 액세스 토큰 입니다.
+        - *refreshToken: (String, header.payload.signature) 리프레시 토큰 입니다.
+      - ex
+        ```json
+        {
+          "success": true,
+          "result": {
+            "memberId": "memberId",
+            "token": {
+              "accessToken": "accessToken", 
+              "refreshToken": "refreshToken"
+            }
           }
         }
-      }
-      ```
+        ```
 - 회원탈퇴 API
   - Request
     ```markdown
@@ -185,7 +200,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          *"message": "회원 탈퇴가 정상적으로 처리되었습니다."
+          "message": "회원 탈퇴가 정상적으로 처리되었습니다."
         }
       }
       ```
@@ -204,14 +219,16 @@ ex) Authorization: Bearer {accessToken}
     - Http Status
       - 200 OK
     - Body
-      ```json
-      {
-        "success": true,
-        "result": {
-          "accessToken": "{accessToken}" (String, header.payload.signature) 액세스 토큰
+      - *accessToken: (String, header.payload.signature) 액세스 토큰 입니다.
+      - ex 
+        ```json
+        {
+          "success": true,
+          "result": {
+            "accessToken": "{accessToken}"
+          }
         }
-      }
-      ```
+        ```
 - TODO 추가 API
   - Request
     ```markdown
@@ -234,7 +251,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          *"message": "할 일이 정상적으로 등록되었습니다."
+          "message": "할 일이 정상적으로 등록되었습니다."
         }
       }
       ```
@@ -256,38 +273,46 @@ ex) Authorization: Bearer {accessToken}
     - Http Status
       - 200 OK
     - Body
-      ```json
-      {
-        "success": true,
-        "result": {
-          *"count": 123,
-          *"todos": [
-            {
-              *"todoId": "{todoID}", (String), Todo ID
-              *"content": "{content}", (String), 내용
-              *"status": "{status}", (String), Todo 상태 (한국어)
-              *"createdAt": "{createdAt}", (String, yyyy-MM-dd hh:mm), 생성일시
-              "updatedAt": "{updatedAt}" (String, yyyy-MM-dd hh:mm), 수정일시
-            },
-            {
-              "todoId": "{todoID}",
-              "content": "{content}",
-              "status": "{status}",
-              "createdAt": "{createdAt}",
-              "updatedAt": "{updatedAt}"
-            }, 
-            ...
-            {
-              "todoId": "{todoID}",
-              "content": "{content}",
-              "status": "{status}",
-              "createdAt": "{createdAt}", 
-              "updatedAt": "{updatedAt}" 
-            }
-          ] 
+      - *count: 해당 회원이 작성한 TODO의 총 개수입니다.
+      - *todos
+        - *todoId: (String) TODO의 ID 입니다.
+        - *content: (String) TODO의 내용 입니다.
+        - *status: (String, { 할 일 | 진행 중 | 완료 | 대기 }) TODO의 상태 입니다.
+        - *createdAt: (String, yyyy-MM-dd hh:mm) TODO의 생성일시 입니다.
+        - updatedAt: (String, yyyy-MM-dd hh:mm) TODO의 수정일시 입니다.
+      - ex
+        ```json
+        {
+          "success": true,
+          "result": {
+            "count": 123,
+            "todos": [
+              {
+                "todoId": "{todoID}", 
+                "content": "{content}",
+                "status": "{status}", 
+                "createdAt": "{createdAt}", 
+                "updatedAt": "{updatedAt}" 
+              },
+              {
+                "todoId": "{todoID}",
+                "content": "{content}",
+                "status": "{status}",
+                "createdAt": "{createdAt}",
+                "updatedAt": "{updatedAt}"
+              }, 
+              ...
+              {
+                "todoId": "{todoID}",
+                "content": "{content}",
+                "status": "{status}",
+                "createdAt": "{createdAt}", 
+                "updatedAt": "{updatedAt}" 
+              }
+            ] 
+          }
         }
-      }
-      ```
+        ```
 - 가장 최근 TODO 조회 API
   - Request
     ```markdown
@@ -303,18 +328,24 @@ ex) Authorization: Bearer {accessToken}
     - Http Status
       - 200 OK
     - Body
-      ```json
-      {
-        "success": true,
-        "result": {
-            *"todoId": "{todoID}", (String), Todo ID
-            *"content": "{content}", (String), 내용
-            *"status": "{status}", (String), Todo 상태 (한국어)
-            *"createdAt": "{createdAt}", (String, yyyy-MM-dd hh:mm), 생성일시
-            "updatedAt": "{updatedAt}" (String, yyyy-MM-dd hh:mm), 수정일시
+      - *todoId: (String) TODO의 ID 입니다.
+      - *content: (String) TODO의 내용 입니다.
+      - *status: (String, { 할 일 | 진행 중 | 완료 | 대기 }) TODO의 상태 입니다.
+      - *createdAt: (String, yyyy-MM-dd hh:mm) TODO의 생성일시 입니다.
+      - updatedAt: (String, yyyy-MM-dd hh:mm) TODO의 수정일시 입니다. 
+      - ex
+        ```json
+        {
+          "success": true,
+          "result": {
+              "todoId": "{todoID}",
+              "content": "{content}",
+              "status": "{status}",
+              "createdAt": "{createdAt}",
+              "updatedAt": "{updatedAt}"
+          }
         }
-      }
-      ```
+        ```
 - TODO 상태 변경 API
   - Request
     ```markdown
@@ -338,7 +369,7 @@ ex) Authorization: Bearer {accessToken}
       {
         "success": true,
         "result": {
-          *"message": "할 일의 상태가 정상적으로 변경되었습니다."
+          "message": "할 일의 상태가 정상적으로 변경되었습니다."
         }
       }
       ```

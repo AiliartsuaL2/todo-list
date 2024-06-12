@@ -171,7 +171,7 @@ class TodoServiceTest {
             assertThat(recentTodo.content())
                     .isEqualTo(CONTENT);
             assertThat(recentTodo.status())
-                    .isEqualTo(TodoStatus.TODO.name());
+                    .isEqualTo(TodoStatus.TODO.getName());
             assertThat(recentTodo.createdAt())
                     .isNotNull();
             assertThat(recentTodo.updatedAt())

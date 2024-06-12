@@ -1,12 +1,12 @@
-package moais.todolist.member.presentation;
+package moais.todolist.todo.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
-import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.StandardCharsets;
@@ -17,8 +17,8 @@ import moais.todolist.global.handler.JwtAccessDeniedHandler;
 import moais.todolist.global.handler.JwtAuthenticationEntryPoint;
 import moais.todolist.global.handler.JwtErrorResponseHandler;
 import moais.todolist.global.handler.JwtExceptionFilter;
-import moais.todolist.member.application.usecase.WithdrawUseCase;
 import moais.todolist.member.domain.RoleType;
+import moais.todolist.todo.application.usecase.UpdateTodoStatusUseCase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles(value = "test")
 @WebMvcTest(
-        value = WithdrawApiV10.class,
+        value = UpdateTodoStatusApiV10.class,
         includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class})
 )
 @Import({
@@ -47,22 +47,21 @@ import org.springframework.test.web.servlet.MockMvc;
         JwtErrorResponseHandler.class,
         H2ConsoleAutoConfiguration.class
 })
-class WithdrawApiV10Test {
+class UpdateTodoStatusApiV10Test {
 
     private static final String REQUEST_JSON ="{"
-            + "\"loginId\": \"loginId\","
-            + "\"password\": \"password\""
+            + "\"status\": \"status\""
             + "}";
     private static String ACCESS_TOKEN;
-    private static final String PATH = "/api/v10/members";
-    private static final String SUCCESS_MESSAGE = "회원 탈퇴가 정상적으로 처리되었습니다.";
+    private static final String PATH = "/api/v10/todos/status";
+    private static final String SUCCESS_MESSAGE = "할 일의 상태가 정상적으로 변경되었습니다.";
 
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     JwtService jwtService;
     @MockBean
-    WithdrawUseCase withdrawUseCase;
+    UpdateTodoStatusUseCase updateTodoStatusUseCase;
 
     @BeforeAll
     static void init(@Value("${jwt.secret-key}") String secretKey) {
@@ -78,7 +77,7 @@ class WithdrawApiV10Test {
         String accessToken = ACCESS_TOKEN;
 
         // when & then
-        mockMvc.perform(delete(PATH)
+        mockMvc.perform(patch(PATH)
                         .header("Authorization", accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
@@ -92,7 +91,7 @@ class WithdrawApiV10Test {
         String body = REQUEST_JSON;
 
         // when & then
-        mockMvc.perform(delete(PATH)
+        mockMvc.perform(patch(PATH)
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
@@ -113,7 +112,7 @@ class WithdrawApiV10Test {
         String body = REQUEST_JSON;
 
         // when & then
-        String response = mockMvc.perform(delete(PATH)
+        String response = mockMvc.perform(patch(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", accessToken)
                         .content(body)
@@ -124,8 +123,8 @@ class WithdrawApiV10Test {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(response).contains(SUCCESS_MESSAGE);
-        then(withdrawUseCase)
+        then(updateTodoStatusUseCase)
                 .should(times(1))
-                .withdraw(any(), any());
+                .updateStatus(any(), any(), any());
     }
 }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">회원가입</h2>
+    <form id="signupForm" class="needs-validation" novalidate>
+        <div class="form-group">
+            <label for="loginId">로그인 ID</label>
+            <input type="text" class="form-control" id="loginId" name="loginId" required>
+            <div class="invalid-feedback">로그인 ID를 입력해주세요.</div>
+        </div>
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+            <div class="invalid-feedback">비밀번호를 입력해주세요.</div>
+        </div>
+        <div class="form-group">
+            <label for="nickname">닉네임</label>
+            <input type="text" class="form-control" id="nickname" name="nickname" required>
+            <div class="invalid-feedback">닉네임을 입력해주세요.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">회원가입</button>
+    </form>
+</div>
+<script>
+    document.getElementById('signupForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const loginId = document.getElementById('loginId').value;
+        const password = document.getElementById('password').value;
+        const nickname = document.getElementById('nickname').value;
+
+        const response = await fetch('/api/v10/members/sign-up', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ loginId, password, nickname })
+        });
+
+        const responseData = await response.json();
+
+        if (responseData.success) {
+            alert(responseData.result.message);
+            window.location.href = '/views/sign-in';
+        } else {
+            alert(responseData.result.errorMessage);
+        }
+    });
+</script>
+</body>
+</html>

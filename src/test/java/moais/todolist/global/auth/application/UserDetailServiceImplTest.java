@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
@@ -34,11 +35,11 @@ class UserDetailServiceImplTest {
 
             // when & then
             Assertions.assertThatThrownBy(() -> userDetailService.loadUserByUsername(memberId))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(UsernameNotFoundException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
 
             Assertions.assertThatThrownBy(() -> userDetailService.loadUserByUsername(emptyMemberId))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(UsernameNotFoundException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         }
 
@@ -52,7 +53,7 @@ class UserDetailServiceImplTest {
 
             // when & then
             Assertions.assertThatThrownBy(() -> userDetailService.loadUserByUsername(memberId))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(UsernameNotFoundException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_USER_ACCOUNT.getMessage());
         }
 
@@ -136,11 +137,11 @@ class UserDetailServiceImplTest {
 
             // when & then
             Assertions.assertThatThrownBy(() -> userDetailService.deleteByMemberId(memberId))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(UsernameNotFoundException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
 
             Assertions.assertThatThrownBy(() -> userDetailService.deleteByMemberId(emptyMemberId))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(UsernameNotFoundException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         }
 
@@ -154,7 +155,7 @@ class UserDetailServiceImplTest {
 
             // when & then
             Assertions.assertThatThrownBy(() -> userDetailService.deleteByMemberId(memberId))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(UsernameNotFoundException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_USER_ACCOUNT.getMessage());
         }
 

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>TODO 목록</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="mb-4">TODO 목록</h2>
+  <button class="btn btn-primary mb-3" onclick="showAddTodoForm()">TODO 생성</button>
+  <button class="btn btn-primary mb-3" onclick="window.location.href='/views/main'">메인 페이지 이동</button>
+  <ul id="todoList" class="list-group">
+    <!-- TODO 항목들이 여기에 추가됩니다 -->
+  </ul>
+</div>
+
+<!-- TODO 생성 폼 모달 -->
+<div class="modal" id="addTodoModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">TODO 생성</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addTodoForm">
+          <div class="form-group">
+            <label for="content">내용</label>
+            <input type="text" class="form-control" id="content" name="content" required>
+          </div>
+          <button type="submit" class="btn btn-primary">생성</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TODO 상태 변경 모달 -->
+<div class="modal" id="updateTodoModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">TODO 상태 변경</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="updateTodoForm">
+          <div class="form-group">
+            <label for="newStatus">새로운 상태 선택</label>
+            <select class="form-control" id="newStatus" name="newStatus">
+              <option value="todo">할 일</option>
+              <option value="inProgress">진행 중</option>
+              <option value="done">완료</option>
+              <option value="pending">대기</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">변경</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  function deleteCookie(name) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  }
+
+  function showAddTodoForm() {
+    $('#addTodoModal').modal('show');
+  }
+
+  function showUpdateTodoForm(todoId) {
+    $('#updateTodoModal').modal('show');
+    $('#updateTodoForm').submit(function(e) {
+      e.preventDefault();
+      updateTodoStatus(todoId);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    const accessToken = getCookie('accessToken');
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      window.location.href = '/views/sign-in';
+      return;
+    }
+
+    const response = await fetch('/api/v10/todos?page=1', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      }
+    });
+
+    const responseData = await response.json();
+    const todoList = document.getElementById('todoList');
+
+    if (responseData.success) {
+      responseData.result.todos.forEach(todo => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item';
+        listItem.textContent = `${todo.content} (${todo.status}) - ${todo.createdAt}`;
+
+        // 상태 수정 버튼 추가
+        const updateButton = document.createElement('button');
+        updateButton.className = 'btn btn-sm btn-primary ml-2';
+        updateButton.textContent = '상태 수정';
+        updateButton.onclick = function() {
+          showUpdateTodoForm(todo.todoId);
+        };
+
+        listItem.appendChild(updateButton);
+        todoList.appendChild(listItem);
+      });
+    } else {
+      alert(responseData.result.errorMessage);
+      if (response.status === 401 || response.status === 403) {
+        deleteCookie('accessToken');
+        deleteCookie('refreshToken');
+        window.location.href = '/views/sign-in';
+      }
+    }
+  });
+
+  document.getElementById('addTodoForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const accessToken = getCookie('accessToken');
+    const content = document.getElementById('content').value;
+
+    const response = await fetch('/api/v10/todos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      },
+      body: JSON.stringify({ content })
+    });
+
+    const responseData = await response.json();
+    if (responseData.success) {
+      alert(responseData.result.message);
+      window.location.reload(); // 페이지 새로고침하여 TODO 목록 갱신
+    } else {
+      alert(responseData.result.errorMessage);
+    }
+  });
+
+  async function updateTodoStatus(todoId) {
+    const newStatus = document.getElementById('newStatus').value;
+
+    const accessToken = getCookie('accessToken');
+    const response = await fetch('/api/v10/todos/status/' + todoId, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+
+    const responseData = await response.json();
+    if (responseData.success) {
+      alert(responseData.result.message);
+      window.location.reload(); // 페이지 새로고침하여 TODO 목록 갱신
+    } else {
+      alert(responseData.result.errorMessage);
+    }
+  }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

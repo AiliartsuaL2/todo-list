@@ -23,6 +23,7 @@ public class TodoRepositoryCustomImpl implements TodoRepositoryCustom {
         Todo latestTodo = queryFactory
                 .selectFrom(todo)
                 .orderBy(todo.modifiedAt.coalesce(todo.createdAt).desc())
+                .where(todo.memberId.eq(memberId))
                 .fetchFirst();
         return Optional.ofNullable(latestTodo);
     }
@@ -31,7 +32,7 @@ public class TodoRepositoryCustomImpl implements TodoRepositoryCustom {
     public List<Todo> findTodosByMemberId(String memberId, int limit, int offset) {
         return queryFactory.selectFrom(todo)
                 .where(todo.memberId.eq(memberId))
-                .orderBy(todo.createdAt.desc())
+                .orderBy(todo.modifiedAt.coalesce(todo.createdAt).desc())
                 .limit(limit)
                 .offset(offset)
                 .fetch();

@@ -71,7 +71,7 @@
   - TODO CRU 관련 페이지
 
 ## ERD
-![erd](https://github.com/AiliartsuaL2/todo-list/assets/89395238/d559987a-f954-4321-91c0-1a304af8faac)
+![todo-list](./src/main/resources/image/todo-list.png)
 
 ## API 명세
 

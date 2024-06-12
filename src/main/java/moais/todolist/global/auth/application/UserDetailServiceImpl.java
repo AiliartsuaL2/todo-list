@@ -23,10 +23,10 @@ public class UserDetailServiceImpl implements UserDetailsService, CreateUserAcco
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
         if (ObjectUtils.isEmpty(memberId)) {
-            throw new IllegalArgumentException(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
+            throw new UsernameNotFoundException(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         }
         return userAccountRepository.findUserAccountByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.NOT_EXIST_USER_ACCOUNT.getMessage()));
+                .orElseThrow(() -> new UsernameNotFoundException(ErrorMessage.NOT_EXIST_USER_ACCOUNT.getMessage()));
     }
 
     @Override

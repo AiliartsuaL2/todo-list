@@ -1,4 +1,4 @@
-package moais.todolist.global;
+package moais.todolist.global.handler;
 
 
 import io.jsonwebtoken.JwtException;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -35,6 +36,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiCommonResponse<ErrorMessage>> httpMessageNotReadableException(HttpMessageNotReadableException ex){
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        String message = ex.getCause().getCause().getMessage();
+        log.warn(
+                LOG_FORMAT,
+                ex.getClass().getSimpleName(),
+                httpStatus.value(),
+                ex.getMessage()
+        );
+        ErrorMessage errorMessage = new ErrorMessage(message);
+        return ResponseEntity
+                .status(httpStatus)
+                .body(new ApiCommonResponse<>(false, errorMessage));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiCommonResponse<ErrorMessage>> missingServletRequestParameterException(MissingServletRequestParameterException ex){
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return writeLogTraceAndResponse(status, ex);
     }

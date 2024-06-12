@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -24,12 +25,21 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String[] ROUTER_PATH = {
+            "/views/main",
+            "/views/sign-up",
+            "/views/sign-in",
+            "/views/todos",
+            "/favicon.ico"
+    };
+
     private static final String[] AUTH_WHITELIST = {
             "/api/v10/members/sign-in",
             "/api/v10/members/sign-up",
             "/api/v10/token/refresh"
     };
 
+    private static final String VIEWS_RESOURCE_PATH = "/resources/templates/views/*";
     private static final String AUTHENTICATION_TEST_URL = "/api/v1/auth/not-use/test";
 
     private final JwtService jwtService;
@@ -45,6 +55,8 @@ public class SecurityConfig {
         http
                 .csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(VIEWS_RESOURCE_PATH).permitAll()
+                        .requestMatchers(HttpMethod.GET, ROUTER_PATH).permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers(AUTHENTICATION_TEST_URL).permitAll()
                         .anyRequest().authenticated())

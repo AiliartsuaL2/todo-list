@@ -23,7 +23,7 @@ public class UpdateTodoStatusApiV10 {
 
     private final UpdateTodoStatusUseCase updateTodoStatusUseCase;
 
-    @PatchMapping("/todos/{todoId}")
+    @PatchMapping("/todos/status/{todoId}")
     public ResponseEntity<ApiCommonResponse<ResponseMessage>> updateTodoStatus(
             @AuthenticationPrincipal
             UserAccount userAccount,

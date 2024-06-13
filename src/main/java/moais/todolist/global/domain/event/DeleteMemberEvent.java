@@ -1,10 +1,10 @@
-package moais.todolist.global.auth.presentation.dto.request;
+package moais.todolist.global.domain.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class DeleteUserAccountEvent {
+public class DeleteMemberEvent {
     private String memberId;
 }

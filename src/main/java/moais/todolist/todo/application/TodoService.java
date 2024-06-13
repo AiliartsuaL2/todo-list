@@ -6,10 +6,7 @@ import moais.todolist.todo.application.dto.request.CreateTodoRequestDto;
 import moais.todolist.todo.application.dto.request.UpdateTodoRequestDto;
 import moais.todolist.todo.application.dto.response.GetTodoListResponseDto;
 import moais.todolist.todo.application.dto.response.GetTodoResponseDto;
-import moais.todolist.todo.application.usecase.CreateTodoUseCase;
-import moais.todolist.todo.application.usecase.GetRecentTodoUseCase;
-import moais.todolist.todo.application.usecase.GetTodoListUseCase;
-import moais.todolist.todo.application.usecase.UpdateTodoStatusUseCase;
+import moais.todolist.todo.application.usecase.*;
 import moais.todolist.todo.domain.Todo;
 import moais.todolist.todo.exception.ErrorMessage;
 import moais.todolist.todo.persistence.TodoRepository;
@@ -22,7 +19,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class TodoService implements CreateTodoUseCase, GetRecentTodoUseCase, GetTodoListUseCase, UpdateTodoStatusUseCase {
+public class TodoService implements CreateTodoUseCase, GetRecentTodoUseCase, GetTodoListUseCase, UpdateTodoStatusUseCase, DeleteTodoUseCase {
 
     private static final Integer TODO_LIST_LIMIT = 20;
 
@@ -64,6 +61,12 @@ public class TodoService implements CreateTodoUseCase, GetRecentTodoUseCase, Get
         validateMember(memberId);
         Todo todo = findById(todoId);
         todo.updateStatus(requestDto.status(), memberId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByMemberId(String memberId) {
+        todoRepository.deleteAllByMemberId(memberId);
     }
 
     private Todo findById(String todoId) {

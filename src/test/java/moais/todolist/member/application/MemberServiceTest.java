@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.UUID;
 import moais.todolist.global.auth.application.usecase.CreateTokenUseCase;
 import moais.todolist.global.auth.domain.Token;
-import moais.todolist.global.auth.presentation.dto.request.CreateUserAccountEvent;
-import moais.todolist.global.auth.presentation.dto.request.DeleteUserAccountEvent;
+import moais.todolist.global.domain.event.CreateMemberEvent;
+import moais.todolist.global.domain.event.DeleteMemberEvent;
 import moais.todolist.member.application.dto.request.SignInRequestDto;
 import moais.todolist.member.application.dto.request.SignUpRequestDto;
 import moais.todolist.member.application.dto.request.WithdrawRequestDto;
@@ -78,7 +78,7 @@ class MemberServiceTest {
 
             then(eventPublisher)
                     .should(times(1))
-                    .publishEvent(any(CreateUserAccountEvent.class));
+                    .publishEvent(any(CreateMemberEvent.class));
         }
     }
 
@@ -174,7 +174,7 @@ class MemberServiceTest {
 
             then(eventPublisher)
                     .should(times(1))
-                    .publishEvent(any(DeleteUserAccountEvent.class));
+                    .publishEvent(any(DeleteMemberEvent.class));
         }
     }
 }

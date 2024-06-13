@@ -2,8 +2,8 @@ package moais.todolist.global.auth.presentation;
 
 import moais.todolist.global.auth.domain.UserAccount;
 import moais.todolist.global.auth.persistence.UserAccountRepository;
-import moais.todolist.global.auth.presentation.dto.request.CreateUserAccountEvent;
-import moais.todolist.global.auth.presentation.dto.request.DeleteUserAccountEvent;
+import moais.todolist.global.domain.event.CreateMemberEvent;
+import moais.todolist.global.domain.event.DeleteMemberEvent;
 import moais.todolist.global.exception.ErrorMessage;
 import moais.todolist.global.exception.EventException;
 import moais.todolist.member.domain.RoleType;
@@ -39,7 +39,7 @@ class UserAccountEventListenerTest {
         @DisplayName("이벤트로 전달되는 객체 자체가 null인 경우 예외가 발생한다.")
         void test1() {
             // given
-            CreateUserAccountEvent event = null;
+            CreateMemberEvent event = null;
 
             // when & then
             Assertions.assertThatThrownBy(() -> publisher.publishEvent(event))
@@ -51,7 +51,7 @@ class UserAccountEventListenerTest {
         void test2() {
             // given
             String memberId = null;
-            CreateUserAccountEvent event = new CreateUserAccountEvent(memberId);
+            CreateMemberEvent event = new CreateMemberEvent(memberId);
 
             // when & then
             Assertions.assertThatThrownBy(() -> publisher.publishEvent(event))
@@ -66,7 +66,7 @@ class UserAccountEventListenerTest {
             String memberId = "memberId";
 
             // when
-            publisher.publishEvent(new CreateUserAccountEvent(memberId));
+            publisher.publishEvent(new CreateMemberEvent(memberId));
             Optional<UserAccount> userAccountByMemberId = userAccountRepository.findUserAccountByMemberId(memberId);
 
             // then
@@ -82,7 +82,7 @@ class UserAccountEventListenerTest {
         @DisplayName("이벤트로 전달되는 객체 자체가 null인 경우 예외가 발생한다.")
         void test1() {
             // given
-            DeleteUserAccountEvent event = null;
+            DeleteMemberEvent event = null;
 
             // when & then
             Assertions.assertThatThrownBy(() -> publisher.publishEvent(event))
@@ -96,7 +96,7 @@ class UserAccountEventListenerTest {
             String memberId = null;
 
             // when & then
-            Assertions.assertThatThrownBy(() -> publisher.publishEvent(new DeleteUserAccountEvent(memberId)))
+            Assertions.assertThatThrownBy(() -> publisher.publishEvent(new DeleteMemberEvent(memberId)))
                     .isInstanceOf(EventException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         }
@@ -110,7 +110,7 @@ class UserAccountEventListenerTest {
             userAccountRepository.save(userAccount);
 
             // when
-            publisher.publishEvent(new DeleteUserAccountEvent(memberId));
+            publisher.publishEvent(new DeleteMemberEvent(memberId));
             Optional<UserAccount> userAccountByMemberId = userAccountRepository.findUserAccountByMemberId(memberId);
 
             // then

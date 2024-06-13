@@ -1,14 +1,14 @@
-package moais.todolist.global.auth.presentation.dto.request;
+package moais.todolist.global.domain.event;
 
 import lombok.Getter;
 import moais.todolist.member.domain.RoleType;
 
 @Getter
-public class CreateUserAccountEvent {
+public class CreateMemberEvent {
     private final String memberId;
     private final String role;
 
-    public CreateUserAccountEvent(String memberId) {
+    public CreateMemberEvent(String memberId) {
         this.memberId = memberId;
         this.role = RoleType.ROLE_USER.getAuthority();
     }

@@ -3,8 +3,8 @@ package moais.todolist.member.application;
 import lombok.RequiredArgsConstructor;
 import moais.todolist.global.auth.application.usecase.CreateTokenUseCase;
 import moais.todolist.global.auth.domain.Token;
-import moais.todolist.global.auth.presentation.dto.request.CreateUserAccountEvent;
-import moais.todolist.global.auth.presentation.dto.request.DeleteUserAccountEvent;
+import moais.todolist.global.domain.event.CreateMemberEvent;
+import moais.todolist.global.domain.event.DeleteMemberEvent;
 import moais.todolist.member.application.dto.request.SignInRequestDto;
 import moais.todolist.member.application.dto.request.SignUpRequestDto;
 import moais.todolist.member.application.dto.request.WithdrawRequestDto;
@@ -41,7 +41,7 @@ public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseC
         memberRepository.save(member);
 
         // 회원가입 이벤트 발행 -> UserAccount 생성
-        eventPublisher.publishEvent(new CreateUserAccountEvent(member.getId()));
+        eventPublisher.publishEvent(new CreateMemberEvent(member.getId()));
     }
 
     @Override
@@ -66,6 +66,6 @@ public class MemberService implements SignUpUseCase, SignInUseCase, WithdrawUseC
         member.withdraw(payload, requestDto.loginId(), requestDto.password());
 
         // 회원 탈퇴시 UserAccount 삭제 이벤트 발행
-        eventPublisher.publishEvent(new DeleteUserAccountEvent(member.getId()));
+        eventPublisher.publishEvent(new DeleteMemberEvent(member.getId()));
     }
 }

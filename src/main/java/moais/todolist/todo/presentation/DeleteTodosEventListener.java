@@ -7,7 +7,8 @@ import moais.todolist.global.domain.event.DeleteMemberEvent;
 import moais.todolist.global.exception.ErrorMessage;
 import moais.todolist.global.exception.EventException;
 import moais.todolist.todo.application.usecase.DeleteTodoUseCase;
-import org.springframework.context.event.EventListener;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.ObjectUtils;
 
 @Slf4j
@@ -17,7 +18,7 @@ public class DeleteTodosEventListener {
 
     private final DeleteTodoUseCase deleteTodoUseCase;
 
-    @EventListener(DeleteMemberEvent.class)
+    @TransactionalEventListener(value = DeleteMemberEvent.class, phase = TransactionPhase.BEFORE_COMMIT)
     public void deleteTodo(DeleteMemberEvent event) {
         validateMemberIdAtEvent(event.getMemberId());
         deleteTodoUseCase.deleteByMemberId(event.getMemberId());

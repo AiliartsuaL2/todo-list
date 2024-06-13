@@ -10,7 +10,8 @@ import moais.todolist.global.domain.event.CreateMemberEvent;
 import moais.todolist.global.domain.event.DeleteMemberEvent;
 import moais.todolist.global.exception.ErrorMessage;
 import moais.todolist.global.exception.EventException;
-import org.springframework.context.event.EventListener;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.ObjectUtils;
 
 @Slf4j
@@ -22,13 +23,13 @@ public class UserAccountEventListener {
 
     private final DeleteUserAccountUseCase deleteUserAccountUseCase;
 
-    @EventListener(CreateMemberEvent.class)
+    @TransactionalEventListener(value = CreateMemberEvent.class, phase = TransactionPhase.BEFORE_COMMIT)
     public void createUserAccount(CreateMemberEvent event) {
         validateMemberIdAtEvent(event.getMemberId());
         createUserAccountUseCase.create(new UserAccount(event.getMemberId(), event.getRole()));
     }
 
-    @EventListener(DeleteMemberEvent.class)
+    @TransactionalEventListener(value = DeleteMemberEvent.class, phase = TransactionPhase.BEFORE_COMMIT)
     public void deleteUserAccount(DeleteMemberEvent event) {
         validateMemberIdAtEvent(event.getMemberId());
         deleteUserAccountUseCase.deleteByMemberId(event.getMemberId());

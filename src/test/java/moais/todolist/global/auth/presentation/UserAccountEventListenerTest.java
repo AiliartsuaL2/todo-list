@@ -13,27 +13,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Optional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringBootTest
-@Transactional
 class UserAccountEventListenerTest {
 
     @Autowired
     ApplicationEventPublisher publisher;
     @Autowired
     UserAccountRepository userAccountRepository;
-
+    @Autowired
+    PlatformTransactionManager transactionManager;
+    @Autowired
+    UserAccountEventListener userAccountEventListener;
+    
     @BeforeAll
+    static void init(@Autowired JdbcTemplate jdbcTemplate) {
+        jdbcTemplate.execute("TRUNCATE TABLE USER_ACCOUNT");
+    }
+
+    @AfterAll
     static void cleanUp(@Autowired JdbcTemplate jdbcTemplate) {
-        jdbcTemplate.execute("truncate table user_account");
+        jdbcTemplate.execute("TRUNCATE TABLE USER_ACCOUNT");
     }
 
     @Nested
     @DisplayName("회원 정보 생성 테스트")
     class CreateUserAccountTest {
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         @Test
         @DisplayName("이벤트로 전달되는 객체 자체가 null인 경우 예외가 발생한다.")
@@ -54,7 +65,11 @@ class UserAccountEventListenerTest {
             CreateMemberEvent event = new CreateMemberEvent(memberId);
 
             // when & then
-            Assertions.assertThatThrownBy(() -> publisher.publishEvent(event))
+            Assertions.assertThatThrownBy(() -> {
+                        transactionTemplate.executeWithoutResult(status -> {
+                            publisher.publishEvent(event);
+                        });
+                    })
                     .isInstanceOf(EventException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         }
@@ -66,10 +81,12 @@ class UserAccountEventListenerTest {
             String memberId = "memberId";
 
             // when
-            publisher.publishEvent(new CreateMemberEvent(memberId));
-            Optional<UserAccount> userAccountByMemberId = userAccountRepository.findUserAccountByMemberId(memberId);
+            transactionTemplate.executeWithoutResult(status -> {
+                publisher.publishEvent(new CreateMemberEvent(memberId));
+            });
 
             // then
+            Optional<UserAccount> userAccountByMemberId = userAccountRepository.findUserAccountByMemberId(memberId);
             Assertions.assertThat(userAccountByMemberId).isPresent();
         }
     }
@@ -77,6 +94,8 @@ class UserAccountEventListenerTest {
     @Nested
     @DisplayName("회원 탈퇴 테스트")
     class DeleteUserAccountTest {
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         @Test
         @DisplayName("이벤트로 전달되는 객체 자체가 null인 경우 예외가 발생한다.")
@@ -94,9 +113,14 @@ class UserAccountEventListenerTest {
         void test2() {
             // given
             String memberId = null;
+            DeleteMemberEvent event = new DeleteMemberEvent(memberId);
 
             // when & then
-            Assertions.assertThatThrownBy(() -> publisher.publishEvent(new DeleteMemberEvent(memberId)))
+            Assertions.assertThatThrownBy(() -> {
+                        transactionTemplate.executeWithoutResult(status -> {
+                            publisher.publishEvent(event);
+                        });
+                    })
                     .isInstanceOf(EventException.class)
                     .hasMessage(ErrorMessage.NOT_EXIST_MEMBER_ID.getMessage());
         }
@@ -108,12 +132,15 @@ class UserAccountEventListenerTest {
             String memberId = "memberId";
             UserAccount userAccount = new UserAccount(memberId, RoleType.ROLE_USER.getAuthority());
             userAccountRepository.save(userAccount);
+            DeleteMemberEvent event = new DeleteMemberEvent(memberId);
 
             // when
-            publisher.publishEvent(new DeleteMemberEvent(memberId));
-            Optional<UserAccount> userAccountByMemberId = userAccountRepository.findUserAccountByMemberId(memberId);
+            transactionTemplate.executeWithoutResult(status -> {
+                publisher.publishEvent(event);
+            });
 
             // then
+            Optional<UserAccount> userAccountByMemberId = userAccountRepository.findUserAccountByMemberId(memberId);
             Assertions.assertThat(userAccountByMemberId).isEmpty();
         }
     }

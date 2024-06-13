@@ -21,6 +21,9 @@ spring:
         format_sql: true
         connection:
           charSet: UTF-8
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
 jwt:
   secret-key: moais-secret-key
   expired-time:

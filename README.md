@@ -1,6 +1,25 @@
 # 모아이스 과제 테스트
 
+### 이주호
+
 ## TO-DO List 서비스
+
+### 서버 접속 링크
+- 사용하지않는 도메인과 연결된 프리티어 EC2 인스턴스가 있어 해당 인스턴스에 배포를 진행하였습니다.
+- 링크: https://api.simple-closet.shop/views/main
+
+### 기술 스택
+- 프레임워크
+  - Spring Boot 3.3.0
+- 언어
+  - Java 17
+- JDBC
+  - Spring Data JPA
+  - Query Dsl 5.0.0
+- View
+  - Thymeleaf
+- Database
+  - H2 (Embedded)
 
 ## 요구사항
 
@@ -386,3 +405,160 @@ ex) Authorization: Bearer {accessToken}
         }
       }
       ```
+      
+## 추가사항
+
+### 서비스 흐름도
+- 회원가입
+  - ![회원가입.png](src%2Fmain%2Fresources%2Fimage%2F%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85.png)
+- 로그인
+  - ![로그인.png](src%2Fmain%2Fresources%2Fimage%2F%EB%A1%9C%EA%B7%B8%EC%9D%B8.png)
+- 액세스 토큰 재발급
+  - ![액세스 토큰 재발급.png](src%2Fmain%2Fresources%2Fimage%2F%EC%95%A1%EC%84%B8%EC%8A%A4%20%ED%86%A0%ED%81%B0%20%EC%9E%AC%EB%B0%9C%EA%B8%89.png)
+- 회원 탈퇴
+  - ![회원 탈퇴.png](src%2Fmain%2Fresources%2Fimage%2F%ED%9A%8C%EC%9B%90%20%ED%83%88%ED%87%B4.png)
+- TODO 생성
+  - ![TODO 생성.png](src%2Fmain%2Fresources%2Fimage%2FTODO%20%EC%83%9D%EC%84%B1.png)
+- 최근 TODO 조회
+  - ![최근 TODO 조회.png](src%2Fmain%2Fresources%2Fimage%2F%EC%B5%9C%EA%B7%BC%20TODO%20%EC%A1%B0%ED%9A%8C.png)
+- TODO 리스트 조회
+  - ![TODO 리스트 조회.png](src%2Fmain%2Fresources%2Fimage%2FTODO%20%EB%A6%AC%EC%8A%A4%ED%8A%B8%20%EC%A1%B0%ED%9A%8C.png)
+- TODO 상태 수정
+  - ![TODO 상태 수정.png](src%2Fmain%2Fresources%2Fimage%2FTODO%20%EC%83%81%ED%83%9C%20%EC%88%98%EC%A0%95.png)
+
+### 코드 구조
+```markdown
+src
+├── main
+│   ├── generated
+│   │   └── moais
+│   │       └── todolist
+│   │           ├── global
+│   │           │   ├── auth
+│   │           │   │   └── domain
+│   │           │   └── domain
+│   │           ├── member
+│   │           │   └── domain
+│   │           └── todo
+│   │               └── domain
+│   ├── java
+│   │   └── moais
+│   │       └── todolist
+│   │           ├── global
+│   │           │   ├── annotation
+│   │           │   ├── aop
+│   │           │   ├── auth
+│   │           │   │   ├── application
+│   │           │   │   │   ├── provider
+│   │           │   │   │   └── usecase
+│   │           │   │   ├── domain
+│   │           │   │   ├── persistence
+│   │           │   │   └── presentation
+│   │           │   │       └── dto
+│   │           │   │           ├── request
+│   │           │   │           └── response
+│   │           │   ├── config
+│   │           │   ├── domain
+│   │           │   │   └── converter
+│   │           │   ├── dto
+│   │           │   ├── exception
+│   │           │   └── handler
+│   │           ├── member
+│   │           │   ├── application
+│   │           │   │   ├── dto
+│   │           │   │   │   ├── request
+│   │           │   │   │   └── response
+│   │           │   │   └── usecase
+│   │           │   ├── domain
+│   │           │   ├── exception
+│   │           │   ├── persistence
+│   │           │   ├── presentation
+│   │           │   └── utils
+│   │           ├── todo
+│   │           │   ├── application
+│   │           │   │   ├── dto
+│   │           │   │   │   ├── request
+│   │           │   │   │   └── response
+│   │           │   │   └── usecase
+│   │           │   ├── domain
+│   │           │   │   └── converter
+│   │           │   ├── exception
+│   │           │   ├── persistence
+│   │           │   ├── presentation
+│   │           │   └── utils
+│   │           └── views
+│   └── resources
+│       ├── image
+│       └── templates
+│           └── views
+└── test
+└── java
+└── moais
+└── todolist
+├── global
+│   ├── auth
+│   │   ├── application
+│   │   │   └── provider
+│   │   ├── persistence
+│   │   └── presentation
+│   └── config
+├── member
+│   ├── application
+│   │   └── dto
+│   │       └── request
+│   ├── domain
+│   ├── persistence
+│   └── presentation
+├── testconfig
+└── todo
+├── application
+│   └── dto
+│       ├── request
+│       └── response
+├── domain
+├── persistence
+└── presentation
+```
+
+### 프로젝트 아키텍처
+- 프로젝트 아키텍처는 클린 아키텍처를 차용하였습니다.
+  - 기능 단위는 UseCase로 분류하였고, 각 도메인별 Service는 UseCase를 구현하는 구현체로 사용되었습니다.
+- 시간 제약으로 인하여 Out에 대한 Port And Adapter 패턴은 생략하였습니다.
+- JPA의 장점(Dirty Checking, 1차 캐시, Auditing 등)을 살리기 위해 Domain과 Entity를 구분하지 않고 같은 클래스로 관리 하였습니다.
+- 각 도메인간의 의존성을 줄이기 위해 이벤트 기반 설계를 하였으며 , 엔티티간 연관관계를 맺지 않았습니다.
+
+### 기타 고려 사항
+- Todo List Service를 사용 할 수 있도록 서버 배포 및 사용자 화면 간단하게 구성하였습니다.
+- Semantic Versioning을 통해 API 버전에 대한 확장성을 고려하였습니다.
+- 비즈니스 고려사항
+  - 최근 TODO 조회라는 말이 모호하여 UX를 고려하였을 때 최근 TODO는 변경(생성, 수정)이 가장 최근 시점에 일어난 TODO라고 생각했기 때문에 수정 일자와 생성 일자를 비교하여 가장 최근 변경되거나 생성된 TODO를 노출시키도록 결정하였습니다.
+  - TODO 목록의 정렬조건 또한 변경이 가장 최근 시점에 일어난 순서대로 정렬을 진행하였습니다.
+  - 회원 가입, 탈퇴의 경우 이벤트가 발행이되고, 그에 따른 추가적인 트랜잭션 작업이 이루어지기 때문에 트랜잭션 전파를 위해 `@TransactionalEventListener`를 사용하였습니다.
+- `Spring AOP`를 이용하여 주요 레이어별 접근에 대한 로깅을 처리하였습니다.
+  - 추가 기능에 대한 확장성을 고려하여 내부 클래스를 이용하여 Advisor를 구현하였습니다.
+  - 유지보수를 고려하여 Pointcut을 한 곳에서 관리하여 호출하는 방식을 사용하였습니다.
+- 단위 테스트
+  - 총 163개의 단위 테스트를 작성하였고, 82%의 구문 커버리지를 달성하였습니다. (QClass, Config, ViewRouter 등을 제거하면 더 높을 것으로 기대)
+    - ![테스트 커버리지.png](src%2Fmain%2Fresources%2Fimage%2F%ED%85%8C%EC%8A%A4%ED%8A%B8%20%EC%BB%A4%EB%B2%84%EB%A6%AC%EC%A7%80.png)
+    - ![테스트 결과.png](src%2Fmain%2Fresources%2Fimage%2F%ED%85%8C%EC%8A%A4%ED%8A%B8%20%EA%B2%B0%EA%B3%BC.png)
+  - 레이어별로 책임을 분리하여 책임에 대한 검증 테스트를 진행하였습니다.
+    - Domain (단위 테스트)
+      - 입력 데이터 검증
+      - 도메인 내부의 비즈니스 로직
+    - Application (단위 테스트)
+      - 통합된 비즈니스 로직 검증
+    - DTO (단위 테스트)
+      - 입력 데이터 검증
+    - Persistence (통합 테스트)
+      - DB 접근 로직 검증
+    - API (부분 통합 테스트)
+      - Request, Response에 대한 데이터 검증
+      - HttpMethod, HttpStatus에 대한 검증
+- 보안
+  - Spring Security와 Jwt를 이용하여 인증 로직을 구현하였습니다.
+    - 요청 헤더를 통한 토큰 인증 방식
+    - 토큰 유효성 검사를 통한 부적절한 접근 방지
+    - JWT 관련 예외 처리 세분화
+  - BCrypt 암호화를 통해 회원의 비밀번호를 해싱하여 저장하였습니다.
+  - 각 Entity별 ID를 Auto Increment가 아닌, UUID를 활용하여 Injection에 대한 안정성을 높혔습니다.
+  - yml 파일을 통해 서버내 secret key등 중요한 데이터를 Property를 통해 관리하게끔 하였고, Profile을 활용하여 운영 환경에 맞는 파일을 설정하도록 구성하였습니다.

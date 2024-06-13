@@ -53,7 +53,7 @@ class UpdateTodoStatusApiV10Test {
             + "\"status\": \"status\""
             + "}";
     private static String ACCESS_TOKEN;
-    private static final String PATH = "/api/v10/todos/status";
+    private static final String PATH = "/api/v10/todos/status/todoId";
     private static final String SUCCESS_MESSAGE = "할 일의 상태가 정상적으로 변경되었습니다.";
 
     @Autowired

@@ -87,6 +87,17 @@
 
 ## API 명세
 
+| 기능            | path                          | method | status code |
+|---------------|--------------------------------|--------|-------------|
+| 회원 가입         | /api/v10/members/sign-up     | POST   | 201 CREATED |
+| 로그인           | /api/v10/members/sign-in     | POST   | 200 OK      |
+| 회원 탈퇴         | /api/v10/members             | DELETE | 200 OK      |
+| 액세스 토큰 재발급    | /api/v10/token/refresh    | POST   | 200 OK      |
+| TODO 추가       | /api/v10/todos                | POST   | 201 CREATED |
+| TODO 목록 조회    | /api/v10/todos               | GET    | 200 OK      |
+| 가장 최근 TODO 조회 | /api/v10/todos/recent       | GET    | 200 OK      |
+| TODO 상태 변경    | /api/v10/todos/status/{todoId}| PATCH  | 200 OK      |
+
 ### 공통 형식
 - 요청 형식
 ```markdown
